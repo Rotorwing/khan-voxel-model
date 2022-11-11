@@ -5,10 +5,38 @@
         <script>
             /**  Controls */
             // Click and drag to Orbit
+            // Right-Click and drag to Pan
             // Scroll to Zoom
 
-            /**  Performance Options! **/
-            //        Recommended settings           Fast       High Quality   Info
+            // Hold Shift and Right-Click to add boxes
+            // Left-CLick to select a box;
+            // Hold Shift and Left-Click to select more than one box
+
+            // TOOL BAR
+            //  Color Options
+            //      Drag sliders to set color
+            //      Drag color swatches onto each other to save colors for later
+            //  
+            //  Upscale Model
+            //      <entire model> Not Yet Implemented (entire model by default)
+            //      number: Each box will become a box NxNxN box
+            //  
+            //  Save Model
+            //      Copy the text out of the text area to save for uploading later
+            //  
+            //  Load Model
+            //      Paste data text into the textarea
+
+            // HOTKEYS
+            // "b": box select
+            // "x"/backspace: delete selected box(s)
+            // "a": select all
+
+            // ANNOYING SCROLLING THING WHERE THE KA PAGE SCROLLS WHEN YOU TRY TO ZOOM:
+            // There are rules on KA that strictly prohibit about asking users to run JS in their console.
+            // For this reason I have included this disclaimer to hopefully satisfy any admins:
+            // RUN THIS AT YOUR OWN RISK!
+            // If you don't understand wat this command does, realize that a command this this could steal your login, authentication codes etc.
         </script>
         <style>
             html, body {
@@ -85,7 +113,7 @@
         <script>
             window.doneLoading = function(){
                 // Add three seconds so be sure everything is loaded
-                setTimeout(() => {
+                setTimeout( function() {
                     document.getElementById("loadingFrame").style.visibility = 'hidden';
                     document.getElementById("renderCanvas").style.visibility  = 'visible';
                 }, 100);
@@ -102,383 +130,392 @@
     </div>
 	<canvas id="renderCanvas"></canvas>
     <div id="toolbar">
-        <style>
-            #toolbar{
-                --ui-background: #353535;
-                --ui-background-hover: #303030;
-                --ui-foreground: #e2e2e2;
-                font-family: sans-serif;
-                font-size: 0.9em;
-            }
-            #toolbar > .tool {
-                margin: 3px;
-                box-sizing: border-box;
-                /*width: 100%;*/
-                border: 2px solid rgb(141, 141, 141);
-                border-radius: 4px;
-                padding: 5px;
-            }
-            .slider, [type=range]{
-                -webkit-appearance: none;
-                appearance: none;
-                height: 10px;
-                background: var(--ui-background);
-                outline: none;
-                border-radius: 2px;
-                -webkit-transition: .2s;
-                transition: opacity .2s;
-            }
-            .slider::-webkit-slider-thumb, [type=range]::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 10px;
-                height: 10px;
-                border-radius: 2px;
-                background: var(--ui-foreground);
-                cursor: pointer;
-            }
-    
-            .slider::-moz-range-thumb, [type=range]::-moz-range-thumb {
-                width: 10px;
-                height: 10px;
-                border-radius: 2px;
-                background: var(--ui-foreground);
-                cursor: pointer;
-            }
-            .button, button, [type=button]{
-                -webkit-appearance: none;
-                appearance: none;
-                background: var(--ui-background);
-                border: none;
-                border-radius: 2px;
-                color: var(--ui-foreground);
-                font-size: 0.8em;
-                padding: 4px 8px 5px;
-            }
-            .button:active, button:active, [type=button]:active{
-                background: var(--ui-background-hover);
-            }
-            .button {
-                text-align: center;
-                /*font-size: 11px;*/
-                font-family: system-ui;
-                margin: 2px;
-                align-items: flex-start;
-            }
-            [type=file]{
-                display: none;
-            }
-            textarea{
-                background-color: var(--ui-background);
-                color: var(--ui-foreground);
-                box-sizing: border-box;
-                width: 100%;
-                position: relative;
-                max-width: 100%;
-                max-height: 300px;
-                font-family: monospace;
-                white-space: nowrap;
-                overflow-wrap: normal;
-            }
-            ::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-
-            /* Track */
-            ::-webkit-scrollbar-track {
-                background: none;
-                visibility: hidden;
-            }
-            ::-webkit-scrollbar-track-piece{
-                background: none;
-                visibility: hidden;
-            }
-            
-            /* Handle */
-            ::-webkit-scrollbar-thumb {
-                background: #88888855; 
-                border-radius: 4px;
-            }
-
-            ::-webkit-scrollbar-corner{
-                background: #88888855;
-                border-radius: 4px 0 0 0;
-            }
-
-            /* Handle on hover */
-            ::-webkit-scrollbar-thumb:hover {
-                background: #888888aa;
-                border: none;
-            }
-            ::-webkit-scrollbar-track-piece{
-                display: none;
-            }
-            ::-webkit-resizer{
-                display: none;
-            }
-
-            input[type="checkbox"] {
-                display: none;
-            }
-            .checkmark {
-                background-color: var(--ui-background);
-                position: relative;
-                width:14px;
-                height: 14px;
-                border-radius: 2px;
-                display: inline-block;
-                margin: 2px 4px 0px 1px;
-            }
-            .checkmark:hover {
-                background-color: var(--ui-background-hover);
-            }
-            .checkmark:after {
-                content: "";
-                position: absolute;
-                display: none;
-                left: 5px;
-                top: 2px;
-                width: 3px;
-                height: 7px;
-                border: solid var(--ui-foreground);
-                border-width: 0 2px 2px 0;
-                -webkit-transform: rotate(45deg);
-                -ms-transform: rotate(45deg);
-                transform: rotate(45deg);
-            }
-            input[type="checkbox"]:checked ~ .checkmark:after {
-                display: block;
-            }
-
-            input[type="number"]{
-                background-color: var(--ui-background);
-                color: var(--ui-foreground);
-                width: 50px;
-                border-radius: 2px;
-                border: none;
-                font-size: inherit;
-            }
-            .number-input{
-                position: relative;
-            }
-            .number-input .inc, .number-input .dec{
-                background-color: #555555;
-                width:9px;
-                height:9px;
-                display: block;
-                position: absolute;
-                right: 2px;
-                border-radius: 2px;
-                border: none;
-                cursor: pointer;
-            }
-            .number-input .inc{
-                top:1px;
-            }
-            .number-input .dec{
-                bottom:1px;
-            }
-            .number-input .inc::after{
-                content: "";
-                width:3px;
-                height:3px;
-                border: solid var(--ui-foreground);
-                border-width: 2px 0 0 2px;
-                display: block;
-                position: absolute;
-                top: 2px;
-                left: 2px;
-                -webkit-transform: rotate(45deg);
-                -ms-transform: rotate(45deg);
-                transform: rotate(45deg);
-            }
-            .number-input .dec::after{
-                content: "";
-                width:3px;
-                height:3px;
-                border: solid var(--ui-foreground);
-                border-width: 0 2px 2px 0;
-                display: block;
-                position: absolute;
-                bottom: 2px;
-                left: 2px;
-                -webkit-transform: rotate(45deg);
-                -ms-transform: rotate(45deg);
-                transform: rotate(45deg);
-            }
-            
-            input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button{
-                -webkit-appearance: none;
-                appearance: none;
-            }
-            
-        </style>
-        <div id="colorTool" class="tool">
-            <script src="menuTools/ColorBlob.js"></script>
+        <div id="padder">
             <style>
-                #colorTool {
+                #toolbar{
+                    --ui-background: #353535;
+                    --ui-background-hover: #303030;
+                    --ui-foreground: #e2e2e2;
                     font-family: sans-serif;
+                    font-size: 0.9em;
                 }
-                .colorBlob {
-                    border: 2px solid grey;
-                    border-radius: 3px;
-                    width: 20px;
-                    height: 20px;
-                    margin: 1px;
+                #padder {
+                    overflow-y: scroll;
+                    position: absolute;
+                    top:0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
                 }
-                .blobs .colorBlob {
-                    display: inline-block;
-                }
-                .blobs {
-                    width: 100%;
-                    display: inline-block;
-                }
-                /*
-                .sliders .valueDisplay{
-                    
-                }*/
-                .divider {
-                    position: relative;
+                #toolbar .tool {
+                    margin: 3px;
                     box-sizing: border-box;
-                    height: 1;
-                    background:none;
-                    border-top: 1px solid lightgray;
-                    margin: 3px 6px 2px;
+                    /*width: 100%;*/
+                    border: 2px solid rgb(141, 141, 141);
+                    border-radius: 4px;
+                    padding: 5px;
                 }
-            </style>
-            <form class = "sliders">
-                <p>
-                    <label>R</label>
-                    <input class="slider sliderr" type="range" min="0" max="255" value="0" oninput="sliderMoved('r', this)">
-                    <label class="valueDisplay rValue">0</label>
-                </p>
-                <p>
-                    <label>G</label>
-                    <input class="slider  sliderg" type="range" min="0" max="255" value="0" oninput="sliderMoved('g', this)">
-                    <label class="valueDisplay gValue">0</label>
-                </p>
-                <p>
-                    <label>B</label>
-                    <input class="slider  sliderb" type="range" min="0" max="255" value="0" oninput="sliderMoved('b', this)">
-                    <label class="valueDisplay bValue">0</label>
-                </p>
-                <p>
-                    <label>A</label>
-                    <input class="slider  slidera" type="range" min="0" max="255" value="255" oninput="sliderMoved('a', this)">
-                    <label class="valueDisplay aValue">255</label>
-                </p>
+                .slider, [type=range]{
+                    -webkit-appearance: none;
+                    appearance: none;
+                    height: 10px;
+                    background: var(--ui-background);
+                    outline: none;
+                    border-radius: 2px;
+                    -webkit-transition: .2s;
+                    transition: opacity .2s;
+                }
+                .slider::-webkit-slider-thumb, [type=range]::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 2px;
+                    background: var(--ui-foreground);
+                    cursor: pointer;
+                }
         
-                <div class="colorBlobWrapper"></div>
-                <div class="blobs">
-        
+                .slider::-moz-range-thumb, [type=range]::-moz-range-thumb {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 2px;
+                    background: var(--ui-foreground);
+                    cursor: pointer;
+                }
+                .button, button, [type=button]{
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: var(--ui-background);
+                    border: none;
+                    border-radius: 2px;
+                    color: var(--ui-foreground);
+                    font-size: 0.8em;
+                    padding: 4px 8px 5px;
+                }
+                .button:active, button:active, [type=button]:active{
+                    background: var(--ui-background-hover);
+                }
+                .button {
+                    text-align: center;
+                    /*font-size: 11px;*/
+                    font-family: system-ui;
+                    margin: 2px;
+                    align-items: flex-start;
+                }
+                [type=file]{
+                    display: none;
+                }
+                textarea{
+                    background-color: var(--ui-background);
+                    color: var(--ui-foreground);
+                    box-sizing: border-box;
+                    width: 100%;
+                    position: relative;
+                    max-width: 100%;
+                    max-height: 300px;
+                    font-family: monospace;
+                    white-space: nowrap;
+                    overflow-wrap: normal;
+                }
+                ::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+
+                /* Track */
+                ::-webkit-scrollbar-track {
+                    background: none;
+                    visibility: hidden;
+                }
+                ::-webkit-scrollbar-track-piece{
+                    background: none;
+                    visibility: hidden;
+                }
                 
-                    <script>
-                        const blobGrid = document.querySelector("#colorTool .sliders .blobs");
-                        for(var i =0; i < 10; i++){
-                            const newBlob = new ColorBlob(i+1);
-                            blobGrid.appendChild(newBlob.getElement());
-                        }
-            
-                        const viewBlob = new ColorBlob(0);
-                        document.querySelector("#colorTool .sliders .colorBlobWrapper").appendChild(viewBlob.getElement());
+                /* Handle */
+                ::-webkit-scrollbar-thumb {
+                    background: #88888855; 
+                    border-radius: 4px;
+                }
+
+                ::-webkit-scrollbar-corner{
+                    background: #88888855;
+                    border-radius: 4px 0 0 0;
+                }
+
+                /* Handle on hover */
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #888888aa;
+                    border: none;
+                }
+                ::-webkit-scrollbar-track-piece{
+                    display: none;
+                }
+                ::-webkit-resizer{
+                    display: none;
+                }
+
+                input[type="checkbox"] {
+                    display: none;
+                }
+                .checkmark {
+                    background-color: var(--ui-background);
+                    position: relative;
+                    width:14px;
+                    height: 14px;
+                    border-radius: 2px;
+                    display: inline-block;
+                    margin: 2px 4px 0px 1px;
+                }
+                .checkmark:hover {
+                    background-color: var(--ui-background-hover);
+                }
+                .checkmark:after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                    left: 5px;
+                    top: 2px;
+                    width: 3px;
+                    height: 7px;
+                    border: solid var(--ui-foreground);
+                    border-width: 0 2px 2px 0;
+                    -webkit-transform: rotate(45deg);
+                    -ms-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                }
+                input[type="checkbox"]:checked ~ .checkmark:after {
+                    display: block;
+                }
+
+                input[type="number"]{
+                    background-color: var(--ui-background);
+                    color: var(--ui-foreground);
+                    width: 50px;
+                    border-radius: 2px;
+                    border: none;
+                    font-size: inherit;
+                }
+                .number-input{
+                    position: relative;
+                }
+                .number-input .inc, .number-input .dec{
+                    background-color: #555555;
+                    width:9px;
+                    height:9px;
+                    display: block;
+                    position: absolute;
+                    right: 2px;
+                    border-radius: 2px;
+                    border: none;
+                    cursor: pointer;
+                }
+                .number-input .inc{
+                    top:1px;
+                }
+                .number-input .dec{
+                    bottom:1px;
+                }
+                .number-input .inc::after{
+                    content: "";
+                    width:3px;
+                    height:3px;
+                    border: solid var(--ui-foreground);
+                    border-width: 2px 0 0 2px;
+                    display: block;
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    -webkit-transform: rotate(45deg);
+                    -ms-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                }
+                .number-input .dec::after{
+                    content: "";
+                    width:3px;
+                    height:3px;
+                    border: solid var(--ui-foreground);
+                    border-width: 0 2px 2px 0;
+                    display: block;
+                    position: absolute;
+                    bottom: 2px;
+                    left: 2px;
+                    -webkit-transform: rotate(45deg);
+                    -ms-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                }
+                
+                input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button{
+                    -webkit-appearance: none;
+                    appearance: none;
+                }
+                
+            </style>
+            <div id="colorTool" class="tool">
+                <script src="menuTools/ColorBlob.js"></script>
+                <style>
+                    #colorTool {
+                        font-family: sans-serif;
+                    }
+                    .colorBlob {
+                        border: 2px solid grey;
+                        border-radius: 3px;
+                        width: 20px;
+                        height: 20px;
+                        margin: 1px;
+                    }
+                    .blobs .colorBlob {
+                        display: inline-block;
+                    }
+                    .blobs {
+                        width: 100%;
+                        display: inline-block;
+                    }
+                    /*
+                    .sliders .valueDisplay{
                         
-                        window.setBlobColor = function (color, preventLoopback) {
-                            //console.log("changed to:", color);
-                            const sliders = document.querySelector("#colorTool .sliders");
-                            const sliderR = sliders.querySelector(".sliderr");
-                            const sliderG = sliders.querySelector(".sliderg");
-                            const sliderB = sliders.querySelector(".sliderb");
-                            const sliderA = sliders.querySelector(".slidera");
-                            sliderR.value = color.r;
-                            sliderG.value = color.g;
-                            sliderB.value = color.b;
-                            sliderA.value = color.a;
-        
-                            sliderMoved('r', {value: sliderR.value}, preventLoopback);
-                            sliderMoved('g', {value: sliderG.value}, preventLoopback);
-                            sliderMoved('b', {value: sliderB.value}, preventLoopback);
-                            sliderMoved('a', {value: sliderA.value}, preventLoopback);
-                            if(window.onBlobColorChange && !preventLoopback) window.onBlobColorChange(viewBlob.color);
-                        }
-                        viewBlob.onChanged = window.setBlobColor;
+                    }*/
+                    .divider {
+                        position: relative;
+                        box-sizing: border-box;
+                        height: 1;
+                        background:none;
+                        border-top: 1px solid lightgray;
+                        margin: 3px 6px 2px;
+                    }
+                </style>
+                <form class = "sliders">
+                    <p>
+                        <label>R</label>
+                        <input class="slider sliderr" type="range" min="0" max="255" value="0" oninput="sliderMoved('r', this)">
+                        <label class="valueDisplay rValue">0</label>
+                    </p>
+                    <p>
+                        <label>G</label>
+                        <input class="slider  sliderg" type="range" min="0" max="255" value="0" oninput="sliderMoved('g', this)">
+                        <label class="valueDisplay gValue">0</label>
+                    </p>
+                    <p>
+                        <label>B</label>
+                        <input class="slider  sliderb" type="range" min="0" max="255" value="0" oninput="sliderMoved('b', this)">
+                        <label class="valueDisplay bValue">0</label>
+                    </p>
+                    <p>
+                        <label>A</label>
+                        <input class="slider  slidera" type="range" min="0" max="255" value="255" oninput="sliderMoved('a', this)">
+                        <label class="valueDisplay aValue">255</label>
+                    </p>
             
-                        function sliderMoved(slider, e, preventLoopback){
-                            const display = document.querySelector(`.sliders .${slider}Value`);
-                            display.innerHTML = e.value;
-                            color = {};
-                            color[slider] = parseInt(e.value);
-                            viewBlob.setColor(color);
-                            if(!preventLoopback) window.onBlobColorChange(viewBlob.color);
-                        }
-                    </script>
-        
-                </div>
-            </form>
-        </div>
-        <div id = "upscale"  class="tool">
-            <script>
-            </script>
-            <form>
-                <label>Upscale Model</label>
-                <p>
-                    <label>
-                        <input type="checkbox" id="entireModelCheck">
-                        <span class="checkmark" for="entireModelCheck"></span>Entire Model
-                    </label>
-                </p>
-                <p>
-                    <label class = "number-input" style="display:inline-block;">
-                        <input type="number" min = 2 max = 10 id="upscale-number" value = 2>
-                        <span class="inc" onclick="document.getElementById('upscale-number').stepUp();"></span>
-                        <span class="dec" onclick="document.getElementById('upscale-number').stepDown();""></span>
-                    </label>
-                    <input type="button" onclick="window.upscale(document.getElementById('upscale-number').value, 
-                                                                 document.getElementById('entireModelCheck').value);" value="Upscale"></label>
-                </p>
-            </form>
-        </div>
-        <div id = "loader"  class="tool">
-            <script>
-            </script>
-            <form>
-                <label>Save Model</label>
-                <p>
-                    <input type="button" onclick="document.getElementById('saveArea').value = window.saveText();return false;" value="Save"></label>
-                    <textarea id="saveArea"></textarea>
-                </p>
-            </form>
-        </div>
-        <div id = "loader"  class="tool">
-            <script>
-            </script>
-            <form>
-                <label>Load Model</label>
-                <p>
-                    <label class="button" for="file-input" value="Choose File">Choose File</label>
-                    <input id="file-input" type="file" name="name" oninput="window.loadFile(this);console.log(this)">
-                </p>
-                <div class="divider"></div>
-                <p>
-                    <input type="button" onclick="window.loadText(document.getElementById('loaderArea').value);" value="Load From Text"></label>
-                    <textarea id="loaderArea"></textarea>
-                </p>
-            </form>
+                    <div class="colorBlobWrapper"></div>
+                    <div class="blobs">
+            
+                    
+                        <script>
+                            const blobGrid = document.querySelector("#colorTool .sliders .blobs");
+                            for(var i =0; i < 10; i++){
+                                const newBlob = new ColorBlob(i+1);
+                                blobGrid.appendChild(newBlob.getElement());
+                            }
+                
+                            const viewBlob = new ColorBlob(0);
+                            document.querySelector("#colorTool .sliders .colorBlobWrapper").appendChild(viewBlob.getElement());
+                            
+                            window.setBlobColor = function (color, preventLoopback) {
+                                //console.log("changed to:", color);
+                                const sliders = document.querySelector("#colorTool .sliders");
+                                const sliderR = sliders.querySelector(".sliderr");
+                                const sliderG = sliders.querySelector(".sliderg");
+                                const sliderB = sliders.querySelector(".sliderb");
+                                const sliderA = sliders.querySelector(".slidera");
+                                sliderR.value = color.r;
+                                sliderG.value = color.g;
+                                sliderB.value = color.b;
+                                sliderA.value = color.a;
+            
+                                sliderMoved('r', {value: sliderR.value}, preventLoopback);
+                                sliderMoved('g', {value: sliderG.value}, preventLoopback);
+                                sliderMoved('b', {value: sliderB.value}, preventLoopback);
+                                sliderMoved('a', {value: sliderA.value}, preventLoopback);
+                                if(window.onBlobColorChange && !preventLoopback) window.onBlobColorChange(viewBlob.color);
+                            }
+                            viewBlob.onChanged = window.setBlobColor;
+                
+                            function sliderMoved(slider, e, preventLoopback){
+                                const display = document.querySelector(".sliders ."+slider+"Value");
+                                display.innerHTML = e.value;
+                                color = {};
+                                color[slider] = parseInt(e.value);
+                                viewBlob.setColor(color);
+                                if(!preventLoopback) window.onBlobColorChange(viewBlob.color);
+                            }
+                        </script>
+            
+                    </div>
+                </form>
+            </div>
+            <div id = "upscale"  class="tool">
+                <script>
+                </script>
+                <form>
+                    <label>Upscale Model</label>
+                    <p>
+                        <label>
+                            <input type="checkbox" id="entireModelCheck">
+                            <span class="checkmark" for="entireModelCheck"></span>Entire Model
+                        </label>
+                    </p>
+                    <p>
+                        <label class = "number-input" style="display:inline-block;">
+                            <input type="number" min = 2 max = 10 id="upscale-number" value = 2>
+                            <span class="inc" onclick="document.getElementById('upscale-number').stepUp();"></span>
+                            <span class="dec" onclick="document.getElementById('upscale-number').stepDown();"></span>
+                        </label>
+                        <input type="button" onclick="window.upscale(document.getElementById('upscale-number').value, 
+                                                                    document.getElementById('entireModelCheck').value);" value="Upscale">
+                    </p>
+                </form>
+            </div>
+            <div id = "loader"  class="tool">
+                <script>
+                </script>
+                <form>
+                    <label>Save Model</label>
+                    <p>
+                        <input type="button" onclick="document.getElementById('saveArea').value = window.saveText();return false;" value="Save">
+                        <textarea id="saveArea"></textarea>
+                    </p>
+                </form>
+            </div>
+            <div id = "loader"  class="tool">
+                <script>
+                </script>
+                <form>
+                    <label>Load Model</label>
+                    <p>
+                        <label class="button" for="file-input" value="Choose File">Choose File</label>
+                        <input id="file-input" type="file" name="name" oninput="window.loadFile(this);console.log(this)">
+                    </p>
+                    <div class="divider"></div>
+                    <p>
+                        <input type="button" onclick="window.loadText(document.getElementById('loaderArea').value);" value="Load From Text">
+                        <textarea id="loaderArea"></textarea>
+                    </p>
+                </form>
+            </div>
         </div>
 
         <script>
-            const opener = document.getElementById("opener");
-            const toolbar = document.getElementById("toolbar");
-            var open = false;
+            const toolbarPane = document.getElementById("toolbar");
+            var toolbarOpen = false;
 
             function toggleToolbar(){
                 console.log(open);
-                if(open){
-                    toolbar.style.left = "100%";
-                    open = false;
+                if(toolbarOpen){
+                    toolbarPane.style.left = "100%";
+                    toolbarOpen = false;
                 }else{
-                    toolbar.style.left = window.innerWidth-toolbar.clientWidth+"px";
-                    open = true;
+                    toolbarPane.style.left = window.innerWidth-toolbarPane.clientWidth+"px";
+                    toolbarOpen = true;
                 }
             }
         </script>

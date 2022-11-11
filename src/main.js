@@ -38,7 +38,7 @@ const createScene = function () {
     //camera.
     //scene.pointer
 
-    camera.attachControl(canvas, true);
+    camera.attachControl(canvas, false);
 
     tools.boxSelect.camera = camera;
 
@@ -133,7 +133,7 @@ const createScene = function () {
             tool.reset();
             updateSelections();
             //tool.revertCameraFrustum();
-            camera.attachControl(canvas, true);
+            camera.attachControl(canvas, false);
             usingTool = "";
         }
 
