@@ -1,0 +1,120 @@
+<div id="colorTool">
+    <script src="tools/ColorBlob.js"></script>
+    <style>
+        #colorTool {
+            font-family: sans-serif;
+        }
+        .colorBlob {
+            border: 2px solid grey;
+            border-radius: 3px;
+            width: 20px;
+            height: 20px;
+            margin: 1px;
+        }
+        .blobs .colorBlob {
+            display: inline-block;
+        }
+        .blobs {
+            width: 100%;
+            display: inline-block;
+        }
+        .slider {
+            -webkit-appearance: none;
+            height: 10px;
+            background: #353535;
+            outline: none;
+            border-radius: 2px;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background: #e2e2e2;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background: #e2e2e2;
+            cursor: pointer;
+        }
+        /*
+        .sliders .valueDisplay{
+            
+        }*/
+    </style>
+    <form class = "sliders">
+        <p>
+            <label>r</label>
+            <input class="slider sliderr" type="range" min="0" max="255" value="0" oninput="sliderMoved('r', this)">
+            <label class="valueDisplay rValue">0</label>
+        </p>
+        <p>
+            <label>g</label>
+            <input class="slider  sliderg" type="range" min="0" max="255" value="0" oninput="sliderMoved('g', this)">
+            <label class="valueDisplay gValue">0</label>
+        </p>
+        <p>
+            <label>b</label>
+            <input class="slider  sliderb" type="range" min="0" max="255" value="0" oninput="sliderMoved('b', this)">
+            <label class="valueDisplay bValue">0</label>
+        </p>
+        <p>
+            <label>a</label>
+            <input class="slider  slidera" type="range" min="0" max="255" value="255" oninput="sliderMoved('a', this)">
+            <label class="valueDisplay aValue">255</label>
+        </p>
+
+        <div class="colorBlobWrapper"></div>
+        <div class="blobs">
+
+        
+            <script>
+                const blobGrid = document.querySelector("#colorTool .sliders .blobs");
+                for(var i =0; i < 10; i++){
+                    const newBlob = new ColorBlob(i+1);
+                    blobGrid.appendChild(newBlob.getElement());
+                }
+    
+                const viewBlob = new ColorBlob(0);
+                document.querySelector("#colorTool .sliders .colorBlobWrapper").appendChild(viewBlob.getElement());
+                
+                window.setBlobColor = function (color, preventLoopback) {
+                    console.log("changed to:", color);
+                    const sliders = document.querySelector("#colorTool .sliders");
+                    const sliderR = sliders.querySelector(".sliderr");
+                    const sliderG = sliders.querySelector(".sliderg");
+                    const sliderB = sliders.querySelector(".sliderb");
+                    const sliderA = sliders.querySelector(".slidera");
+                    sliderR.value = color.r;
+                    sliderG.value = color.g;
+                    sliderB.value = color.b;
+                    sliderA.value = color.a;
+
+                    sliderR.oninput(this);
+                    sliderG.oninput(this);
+                    sliderB.oninput(this);
+                    sliderA.oninput(this);
+                    if(window.onBlobColorChange && !preventLoopback) window.onBlobColorChange(viewBlob.color);
+                }
+                viewBlob.onChanged = window.setBlobColor;
+    
+                function sliderMoved(slider, e){
+                    const display = document.querySelector(`.sliders .${slider}Value`);
+                    display.innerHTML = e.value;
+                    color = {};
+                    color[slider] = parseInt(e.value);
+                    viewBlob.setColor(color);
+                    window.onBlobColorChange(viewBlob.color);
+                }
+            </script>
+
+        </div>
+    </form>
+</div>
